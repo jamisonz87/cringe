@@ -1,0 +1,163 @@
+{% extends 'cringe_app/base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Home{% endblock %}
+{% block css %}<link rel="stylesheet" type="text/css" href="{% static 'css/forum.css' %}">{% endblock %}
+
+{% block body %}
+<nav class="navbar is-white topNav">
+	<div class="container">
+		<div class="navbar-brand">
+			<a class="navbar-item" href="{% url 'index' %}">
+				<b>CRINGE</b>
+			</a>
+			<div class="navbar-burger burger" data-target="topNav">
+				<span></span>
+				<span></span>
+				<span></span>
+			</div>
+		</div>
+		<div id="topNav" class="navbar-menu">
+			<div class="navbar-start">
+				<!--<a class="navbar-item" href="cover.html">Home</a>-->
+			</div>
+			<div class="navbar-end">
+				<div class="navbar-item">
+					<div class="field is-grouped">
+						<p class="control">
+							{% if not user.is_authenticated %}
+							<a href="{% url 'register' %}" class="button is-small">
+								<span class="icon">
+									<i class="fa fa-user-plus"></i>
+								</span>
+								
+								<span>
+									Register
+								</span>
+								
+							</a>
+							{% endif %}
+						</p>
+						<p class="control">
+							{% if user.is_authenticated %}
+								<a href="{% url 'logout' %}" class="button is-small is-info is-outlined">
+									<span class="icon">
+										<i class="fa fa-user"></i>
+									</span>
+									<span>Logout</span>
+								</a>
+							{% else %}
+								<a href="{% url 'login' %}" class="button is-small is-info is-outlined">
+									<span class="icon">
+										<i class="fa fa-user"></i>
+									</span>
+									<span>Login</span>
+								</a>
+							{% endif %}
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</nav>
+<section class="container">
+	<div class="columns">
+		<div class="column is-3">
+			{% if user.is_authenticated %}
+			<a class="button is-primary is-block is-alt is-large" id="showModal" href="#">New Post</a>
+			{% endif %}
+			<aside class="menu">
+				<p class="menu-label">
+					Tags
+				</p>
+				<ul class="menu-list">
+					<li><span class="tag is-medium ">Question</span></li>
+				</ul>
+			</aside>
+		</div>
+		<div class="column is-9">
+			<div class="box content">
+				{% for thread in threads %}
+				<article class="post">
+					<a href="{% url 'thread' thread.id %}">
+						<h4>{{ thread.title }}</h4>
+					</a>
+					<div class="media">
+						<!--
+							<div class="media-left">
+								<p class="image is-32x32">
+									<img src="http://bulma.io/images/placeholders/128x128.png">
+								</p>
+							</div>
+						-->
+						<div class="media-content">
+							<div class="content">
+								<p>
+									<a href="#">@{{ thread.user }}</a> created {{ thread.date_created | naturaltime }} &nbsp;
+									<span class="tag">{{ thread.thread_type }}</span>
+								</p>
+							</div>
+						</div>
+						<div class="media-right">
+							<span class="has-text-grey-light"><i class="fa fa-comments"></i>{{ thread.reply_set.count }}</span>
+						</div>
+					</div>
+				</article>
+				{% endfor %}
+			</div>
+		</div>
+	</div>
+
+	<div class="modal">
+		<div class="modal-background"></div>
+		<div class="modal-content">
+			<div class='image'>
+				<header class="modal-card-head">
+					<p class="modal-card-title">New Post</p>
+					<button class="delete modal-close" aria-label="close"></button>
+				</header>
+				<form action="{% url 'new_thread' %}" method="POST">
+					{% csrf_token %}
+					<section class="modal-card-body">
+						<!-- Content ... -->
+							<div class="field">
+								<div class="control">
+									{{ form.title }}
+								</div>
+							</div>
+			
+							<div class="field">
+								<div class="control">
+									{{ form.description | safe }}
+									{{ form.media }}
+								</div>
+							</div>
+
+							<div class="field">
+								<div class="control">
+									{{ form.thread_type }}
+								</div>
+							</div>
+					</section>
+					<footer class="modal-card-foot">
+						<button type="submit" class="button is-success">Save changes</button>
+					</footer>
+				</form>
+			</div>
+		</div>
+		</div>
+</section>
+<script src = "https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script async type="text/javascript" src="{% static 'js/bulma.js' %}"></script>
+<script>
+	$("#showModal").click(function() {
+		$(".modal").addClass("is-active");  
+		});
+
+		$(".modal-close").click(function() {
+		$(".modal").removeClass("is-active");
+		});
+</script>
+{% endblock %}

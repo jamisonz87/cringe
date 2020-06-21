@@ -1,0 +1,139 @@
+{% extends 'cringe_app/base.html' %}
+{% load static %}
+{% load humanize %}
+{% block title %} {{ thread.title }} {% endblock %}
+{% block css %}<link rel="stylesheet" type="text/css" href="{% static 'css/forum.css' %}">{% endblock %}
+{% block body %}
+		<nav class="navbar is-white topNav">
+			<div class="container">
+				<div class="navbar-brand">
+					<a class="navbar-item" href="{% url 'index' %}">
+						<b>CRINGE</b>
+					</a>
+					<div class="navbar-burger burger" data-target="topNav">
+						<span></span>
+						<span></span>
+						<span></span>
+					</div>
+				</div>
+				<div id="topNav" class="navbar-menu">
+					<div class="navbar-start">
+						<!--<a class="navbar-item" href="cover.html">Home</a>-->
+					</div>
+					<div class="navbar-end">
+						<div class="navbar-item">
+							<div class="field is-grouped">
+								<p class="control">
+									{% if not user.is_authenticated %}
+									<a href="{% url 'register' %}" class="button is-small">
+										<span class="icon">
+											<i class="fa fa-user-plus"></i>
+										</span>
+										
+										<span>
+											Register
+										</span>
+										
+									</a>
+									{% endif %}
+								</p>
+								<p class="control">
+									{% if user.is_authenticated %}
+										<a href="{% url 'logout' %}" class="button is-small is-info is-outlined">
+											<span class="icon">
+												<i class="fa fa-user"></i>
+											</span>
+											<span>Logout</span>
+										</a>
+									{% else %}
+										<a href="{% url 'login' %}" class="button is-small is-info is-outlined">
+											<span class="icon">
+												<i class="fa fa-user"></i>
+											</span>
+											<span>Login</span>
+										</a>
+									{% endif %}
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</nav>
+		<section class="container">
+				<div class="column is-9">
+					<div class="box content">
+						<article class="post">
+							<h4>{{ thread.title }}</h4>
+						</article>
+					</div>
+				</div>
+			</div>
+        </section>
+        <br />
+        <section class="container">
+            <div class="column is-9">
+                <div class="box content">
+                    <article class="post">
+                        <h4>{{ thread.description | safe }}</h4>
+                        <div class="media">
+                            <div class="media-content">
+                                <div class="content">
+                                    <p>
+                                        <a href="#">@{{ thread.user }}</a> created {{ thread.date_created | naturaltime }} &nbsp;
+                                        <span class="tag">{{ thread.thread_type }}</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                    {% for reply in thread.reply_set.all %}
+                    <article class="post">
+                        <h4>{{ reply.message | safe }}</h4>
+                        <div class="media">
+                             <!--
+                            <div class="media-left">
+                               
+                                    <p class="image is-32x32">
+                                        <img src="http://bulma.io/images/placeholders/128x128.png">
+                                    </p>
+                                
+                            </div>
+                            -->
+                            <div class="media-content">
+                                <div class="content">
+                                    <p>
+                                        <a href="#">@{{ reply.user }}</a> replied {{ reply.date_created | naturaltime }} &nbsp;
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+					{% endfor %}
+					{% if user.is_authenticated %}
+					<form action="" method="POST">
+						{% csrf_token %}
+						{{ form.message | safe }}
+						<br />
+						<button style='width:50%' type="submit" class="button is-block is-link is-fullwidth is-medium">Submit</button>
+					</form>
+					{% endif %}
+                </div>
+            </div>
+           
+        </div>
+       
+    </section>
+   
+        <script async type="text/javascript" src="{% static 'js/bulma.js' %}"></script>
+        <script>
+			CKEDITOR.replace("cke-align", { 
+				on : {
+					// maximize the editor on startup
+					'instanceReady' : function( evt ) {
+					evt.editor.resize("100%", $("#area").height());
+					}
+				}
+				});
+		</script>
+{% endblock %}

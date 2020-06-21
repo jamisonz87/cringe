@@ -1,0 +1,6 @@
+# Ignore them please
+
+.venv
+venv/
+db.sqlite3
+media
